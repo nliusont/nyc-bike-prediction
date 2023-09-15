@@ -8,7 +8,14 @@ from pandas.tseries.holiday import USFederalHolidayCalendar as calendar
 
 st.set_page_config(page_title="Predicting NYC Bike Ridership", layout="wide")
 st.title("Predicting NYC Bike Ridership")
-
+st.write('This project uses (predominantly) weather data to predict daily bike ridership across New York City. New York City\
+         publishes bike ridership data via it\'s open data portal. I used the total daily counts across six primary bike\
+          counters and incorporated hourly weather data to train a predictive model to forecast the following day\'s ridership.')
+st.write('')
+st.write('The model utilizes gradient boosted trees via the xgboost library.')
+st.write('')
+st.write('The below charts show prediction results for two months in 2023. These months were witheld from model training and validation so \
+         the model has never seen them before.')
 test_df = pd.read_pickle('data/test_df.pkl')
 jan = test_df[test_df['date'].dt.month==1].copy()
 jan = pd.melt(jan[['date', 'actual', 'predicted']], id_vars=['date'], value_vars=['actual', 'predicted'])
@@ -120,7 +127,8 @@ wthr = pd.DataFrame(data=[[tomorrow]+['']*13],
                     columns = ['date', 'prcp', 'tmax', 'tmin', 'rad', 'day_precip', 'day_real_feel',
                             'day_wind', 'year', 'month', 'dow', 'dom', 'hol', 'prev_count'])
 st.markdown("<p></p>", unsafe_allow_html=True)
-st.markdown("<h4 style='text-align: center;'>Make your own prediction: </h4>", unsafe_allow_html=True)
+st.markdown("<p></p>", unsafe_allow_html=True)
+st.markdown("<h4 style='text-align: left;'>Make your own prediction! </h4>", unsafe_allow_html=True)
 st.markdown("<p></p>", unsafe_allow_html=True)
 
 c1, c2, c3, c4, c5 = st.columns(5)
@@ -174,6 +182,6 @@ with c4:
     st.write(date.strftime('%Y-%m-%d'))
     if st.button("predict"):
         pred = predict_biking(wthr.drop(columns=['date']))
-        st.markdown(f"<h1 style='text-align: center;'>{pred:0.0f} ", unsafe_allow_html=True)
+        st.markdown(f"<h1 style='text-align: center;'>{pred:0.0f} bikers", unsafe_allow_html=True)
         st.markdown("<h1 style='text-align: center;'>&#127881</h1>", unsafe_allow_html=True)
 
