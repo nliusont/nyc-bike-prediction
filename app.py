@@ -187,11 +187,11 @@ with c5:
     predict = st.button("predict", on_click=predict_biking())
     if predict:
         pred = st.session_state['pred']
-        st.markdown(f"<h1 style='text-align: center;'>{pred:0.0f} bikers", unsafe_allow_html=True)
+        st.markdown(f"<h1 style='text-align: left;'>{pred:0.0f} bikers", unsafe_allow_html=True)
         if np.round(pred, 0) % 2 == 0:
-            st.markdown(f"<h1 style='text-align: center;'>&#127881 &#128692;&#8205;&#9792;&#65039;</h1>", unsafe_allow_html=True)
+            st.markdown(f"<h1 style='text-align: left;'>&#127881 &#128692;&#8205;&#9792;&#65039;</h1>", unsafe_allow_html=True)
         else:
-            st.markdown(f"<h1 style='text-align: center;'>&#127881 &#128692</h1>", unsafe_allow_html=True)
+            st.markdown(f"<h1 style='text-align: left;'>&#127881 &#128692</h1>", unsafe_allow_html=True)
 
         
 
