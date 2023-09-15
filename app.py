@@ -7,6 +7,17 @@ from app_funcs import get_forecast, predict_biking
 
 st.set_page_config(page_title="Predicting NYC Bike Ridership", layout="wide")
 
+# create default states
+tomorrow = datetime.today() + timedelta(days=1)
+states = ['date', 'prcp', 'tmax', 'tmin', 'rad', 'day_precip', 'day_real_feel',
+                            'day_wind', 'prev_count']
+for state in states:
+    if state not in st.session_state:
+        if state=='date':
+            st.session_state[state] = tomorrow
+        else: 
+            st.session_state[state] = str(0.)
+
 st.title("Predicting NYC Bike Ridership")
 st.write('This project uses (predominantly) weather data to predict daily bike ridership across New York City. New York City\
          publishes bike ridership data via it\'s open data portal. I used the total daily counts across six primary bike\
@@ -121,17 +132,6 @@ col2.altair_chart(aug_bound, use_container_width=True)
 
 ### FORECAST
 
-# create empty df for input fields
-tomorrow = datetime.today() + timedelta(days=1)
-states = ['date', 'prcp', 'tmax', 'tmin', 'rad', 'day_precip', 'day_real_feel',
-                            'day_wind', 'prev_count']
-for state in states:
-    if state not in st.session_state:
-        if state=='date':
-            st.session_state = tomorrow
-        else: 
-            st.session_state[state] = 0.
-
 st.markdown("<p></p>", unsafe_allow_html=True)
 st.markdown("<p></p>", unsafe_allow_html=True)
 st.markdown("<h4 style='text-align: left;'>Make your own prediction! </h4>", unsafe_allow_html=True)
@@ -152,8 +152,7 @@ with c1:
 
 with c2:
     st.markdown("<p></p>", unsafe_allow_html=True)
-    date = st.date_input(label='select date', 
-                         value=tomorrow,
+    date = st.date_input(label='select date',
                         key='date')
     prev_count = st.text_input("previous day ridership",
                                placeholder='try 17297, the daily average',
@@ -192,8 +191,8 @@ with c5:
         if np.round(pred, 0) % 2 == 0:
             st.markdown(f"<h1 style='text-align: center;'>&#127881 &#128692;&#8205;&#9792;&#65039;</h1>", unsafe_allow_html=True)
         else:
-            st.markdown(f"<h1 style='text-align: center;'>&#127881 &#128692;&#8205;&#9792;&#65039;</h1>", unsafe_allow_html=True)
-            #128692
+            st.markdown(f"<h1 style='text-align: center;'>&#127881 &#128692</h1>", unsafe_allow_html=True)
+
         
 
 st.markdown("<h4 style='text-align: left;'>Background & sources</h4>", unsafe_allow_html=True)
