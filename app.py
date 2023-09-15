@@ -185,3 +185,17 @@ with c4:
         st.markdown(f"<h1 style='text-align: center;'>{pred:0.0f} bikers", unsafe_allow_html=True)
         st.markdown("<h1 style='text-align: center;'>&#127881</h1>", unsafe_allow_html=True)
 
+st.markdown("<h4 style='text-align: left;'>Background & sources</h4>", unsafe_allow_html=True)
+li = 'https://www.linkedin.com/in/nliusont/'
+st.write('This streamlit app and underlying model were developed \
+         by [Nick Liu-Sontag](%s), a data scientist :nerd_face: in Brooklyn, NY' % li)
+
+od = 'https://data.cityofnewyork.us/Transportation/Bicycle-Counts/uczf-rk3c'
+om = 'https://open-meteo.com/'
+noa = 'https://www.ncdc.noaa.gov/cdo-web/webservices/v2#dataTypes'
+st.write('Sources: ')
+st.write('[NYC Open Data](%s)' % od)
+st.write('[Open Mateo Weather API](%s)' % om)
+st.write('[NOAA Climate Data Online API](%s)' % noa)
+
+
