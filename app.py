@@ -4,9 +4,9 @@ import streamlit as st
 import altair as alt
 from datetime import datetime, timedelta
 from app_funcs import get_forecast, predict_biking
-from pandas.tseries.holiday import USFederalHolidayCalendar as calendar
 
 st.set_page_config(page_title="Predicting NYC Bike Ridership", layout="wide")
+
 st.title("Predicting NYC Bike Ridership")
 st.write('This project uses (predominantly) weather data to predict daily bike ridership across New York City. New York City\
          publishes bike ridership data via it\'s open data portal. I used the total daily counts across six primary bike\
@@ -37,7 +37,7 @@ jan_chart = alt.Chart(jan).mark_line().encode(
 nearest_date = alt.selection_point(nearest=True, on='mouseover',
                         fields=['date'], empty=False)
 
-# Transparent selectors across the chart. This is what tells us
+# transparent selectors across the chart. This is what tells us
 # the x-value of the cursor
 selectors = alt.Chart(jan).mark_point().encode(
     x='date:T',
@@ -47,17 +47,17 @@ selectors = alt.Chart(jan).mark_point().encode(
     nearest_date
 )
 
-# Draw points on the line, and highlight based on selection
+# traw points on the line, and highlight based on selection
 points = jan_chart.mark_point().encode(
     opacity=alt.condition(nearest_date, alt.value(1), alt.value(0))
 )
 
-# Draw text labels near the points, and highlight based on selection
+# draw text labels near the points, and highlight based on selection
 text = jan_chart.mark_text(align='left', dx=10, dy=10).encode(
     text=alt.condition(nearest_date, alt.Text('value:Q', format='.0f'), alt.value(' '))
 )
 
-# Draw a rule at the location of the selection
+# draw a rule at the location of the selection
 rules = alt.Chart(jan).mark_rule(color='gray').encode(
     x='date:T'
 ).transform_filter(
@@ -123,9 +123,15 @@ col2.altair_chart(aug_bound, use_container_width=True)
 
 # create empty df for input fields
 tomorrow = datetime.today() + timedelta(days=1)
-wthr = pd.DataFrame(data=[[tomorrow]+['']*13],
-                    columns = ['date', 'prcp', 'tmax', 'tmin', 'rad', 'day_precip', 'day_real_feel',
-                            'day_wind', 'year', 'month', 'dow', 'dom', 'hol', 'prev_count'])
+states = ['date', 'prcp', 'tmax', 'tmin', 'rad', 'day_precip', 'day_real_feel',
+                            'day_wind', 'prev_count']
+for state in states:
+    if state not in st.session_state:
+        if state=='date':
+            st.session_state = tomorrow
+        else: 
+            st.session_state[state] = 0.
+
 st.markdown("<p></p>", unsafe_allow_html=True)
 st.markdown("<p></p>", unsafe_allow_html=True)
 st.markdown("<h4 style='text-align: left;'>Make your own prediction! </h4>", unsafe_allow_html=True)
@@ -135,55 +141,60 @@ c1, c2, c3, c4, c5 = st.columns(5)
 
 with c1:
     st.markdown("<p></p>", unsafe_allow_html=True)
-    overwrite_date = 0
-    def default_date():
-        global overwrite_date
-        overwrite_date = 1
-    def undefault_date():
-        global overwrite_date
-        overwrite_date = 0
-    date = st.date_input(label='select date', value=wthr['date'][0], on_change=undefault_date())
-    if st.button("fill with tomorrow's forecast", on_click=default_date()):
+    if st.button("fill with tomorrow's forecast"):
         wthr = get_forecast()
-        date = tomorrow
+        for col in wthr.columns:
+            if col =='date':
+                st.session_state[col] = datetime.utcfromtimestamp(wthr[col].values[0].astype('int64') * 1e-9)
+            else:
+                st.session_state[col] = str(wthr[col].values[0])
     st.write('or fill in your own data:')
 
 with c2:
     st.markdown("<p></p>", unsafe_allow_html=True)
-    st.write(date.strftime('%Y-%m-%d'))
-    prev_count = st.text_input("previous day ridership", value=wthr['prev_count'][0], placeholder='try 17297, the daily average')
-    tmax = st.text_input("high temp (F)", value=wthr['tmax'][0], placeholder='high temp')
-    tmin = st.text_input("low temp (F)", value=wthr['tmin'][0], placeholder='low temp')
-    day_rf = st.text_input("daytime realfeel (F)", value=wthr['day_real_feel'][0], placeholder='avg. daytime "feels like"')
-    precip = st.text_input("total precipitation (in)", value=wthr['prcp'][0], placeholder='total 24 hr precip.')
-    day_precip = st.text_input("daytime precipitation (in)", value=wthr['day_precip'][0], placeholder='total daytime precip.')
-    day_wind = st.text_input("avg. wind speed (mph)", value=wthr['day_wind'][0], placeholder='avg. daytime wind speed')
-    rad = st.text_input("total solar radiation (W/m2)", wthr['rad'][0], placeholder='how sunny it is, try 2700')
+    date = st.date_input(label='select date', 
+                         value=tomorrow,
+                        key='date')
+    prev_count = st.text_input("previous day ridership",
+                               placeholder='try 17297, the daily average',
+                               key='prev_count')
+    tmax = st.text_input("high temp (F)", 
+                         placeholder='high temp',
+                         key='tmax')
+    tmin = st.text_input("low temp (F)", 
+                         placeholder='low temp',
+                         key='tmin')
+    day_rf = st.text_input("daytime realfeel (F)", 
+                           placeholder='avg. daytime "feels like"',
+                           key='day_real_feel')
 
-with c4:
-    cols = ['date', 'prcp', 'tmax', 'tmin', 'rad', 'day_precip', 'day_real_feel','day_wind', 'prev_count']
-    input_data = pd.Series([date, precip, tmax, tmin, rad, day_precip, day_rf, day_wind, prev_count])
-    for i in range(0,len(cols)):
-        wthr[cols[i]] = input_data[i]
-
-    wthr['date'] = pd.to_datetime(wthr['date'])
-    wthr['year'] = wthr['date'].dt.year
-    wthr['month'] = wthr['date'].dt.month
-    wthr['date'] = pd.to_datetime(wthr['date'])
-    wthr['dow'] = wthr['date'].dt.dayofweek
-    wthr['dom'] = wthr['date'].dt.day
-    # holidays
-    cal = calendar()
-    holidays = cal.holidays(start=wthr['date'].min(), end=wthr['date'].max())
-    wthr['hol'] = wthr['date'].isin(holidays)
-
-
+with c3:
     st.markdown("<p></p>", unsafe_allow_html=True)
-    st.write(date.strftime('%Y-%m-%d'))
-    if st.button("predict"):
-        pred = predict_biking(wthr.drop(columns=['date']))
+    precip = st.text_input("total precipitation (in)", 
+                           placeholder='total 24 hr precip.',
+                           key='prcp')
+    day_precip = st.text_input("daytime precipitation (in)", 
+                               placeholder='total daytime precip.',
+                               key='day_precip')
+    day_wind = st.text_input("avg. wind speed (mph)", 
+                             placeholder='avg. daytime wind speed',
+                             key='day_wind')
+    rad = st.text_input("total solar radiation (W/m2)", 
+                        placeholder='how sunny it is, try 2700',
+                        key='rad')
+
+with c5:
+    st.markdown("<p></p>", unsafe_allow_html=True)
+    predict = st.button("predict", on_click=predict_biking())
+    if predict:
+        pred = st.session_state['pred']
         st.markdown(f"<h1 style='text-align: center;'>{pred:0.0f} bikers", unsafe_allow_html=True)
-        st.markdown("<h1 style='text-align: center;'>&#127881</h1>", unsafe_allow_html=True)
+        if np.round(pred, 0) % 2 == 0:
+            st.markdown(f"<h1 style='text-align: center;'>&#127881 &#128692;&#8205;&#9792;&#65039;</h1>", unsafe_allow_html=True)
+        else:
+            st.markdown(f"<h1 style='text-align: center;'>&#127881 &#128692;&#8205;&#9792;&#65039;</h1>", unsafe_allow_html=True)
+            #128692
+        
 
 st.markdown("<h4 style='text-align: left;'>Background & sources</h4>", unsafe_allow_html=True)
 li = 'https://www.linkedin.com/in/nliusont/'

@@ -76,18 +76,39 @@ def get_forecast():
     wthr = wthr[['date', 'prcp', 'tmax', 'tmin', 'rad', 'day_precip', 'day_real_feel', 'day_wind', 'year', 'month', 'dow', 'dom', 'hol', 'prev_count']].copy()
     return wthr
 
-def predict_biking(df):
+def predict_biking():
     '''takes weather forecast and predicts ridership'''
     import pickle
     import pandas as pd
+    import streamlit as st
+    from pandas.tseries.holiday import USFederalHolidayCalendar as calendar
 
     #import model
     with open('model/xgb_v1.pkl', 'rb') as f:
         model = pickle.load(f)
+
+    df = pd.DataFrame(index=[0])
+
+    for k, v in st.session_state.items():
+        if k=='pred':
+            continue
+        elif k=='date':
+            df[k] = v
+        elif k=='hol':
+            df[k] = bool(v)
+        else:
+            df[k] = float(v)
     
-    for col in df.columns:
-        df[col] = pd.to_numeric(df[col])
+    df['date'] = pd.to_datetime(df['date'])
+    df['year'] = df['date'].dt.year
+    df['month'] = df['date'].dt.month
+    df['dow'] = df['date'].dt.dayofweek
+    df['dom'] = df['date'].dt.day
+    # holidays
+    cal = calendar()
+    holidays = cal.holidays(start=df['date'].min(), end=df['date'].max())
+    df['hol'] = df['date'].isin(holidays)
 
-    prediction = model.predict(df)[0]
-
-    return prediction
+    df = df[['prcp', 'tmax', 'tmin', 'rad', 'day_precip', 'day_real_feel', 'day_wind', 'year', 'month', 'dow', 'dom', 'hol', 'prev_count']]
+    pred = model.predict(df)[0]
+    st.session_state['pred'] = pred
