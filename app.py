@@ -234,9 +234,9 @@ with column1:
     st.write('At the outset of training, Jan 2023 and Aug 2023 were witheld as test sets. The remaining data was split \
             into training (70%) and validation (30%) sets. Initial testing was performed with a range of regressors running with \
             default hyperparameters. Xgboost was the clear favorite.')
-    st.write('I then went through uncountable rounds of feature selection and hyperparameter tuning (there were many more feature than what is listed above).')
+    st.write('I then went through uncountable rounds of feature selection and hyperparameter tuning (there were many more features than what is listed above).')
     st.markdown("<div><i>Performance</i></div>", unsafe_allow_html=True) 
-    st.write('The below tables list the models performance on each set of data')
+    st.write('The below tables list the model\'s performance on each set of data')
     with open('data/performance.pkl', 'rb') as f:
         perf = pickle.load(f)
     st.write(perf)
