@@ -11,7 +11,7 @@ st.set_page_config(page_title="Predicting NYC Bike Ridership", layout="wide")
 # create default states
 tomorrow = datetime.today() + timedelta(days=1)
 states = ['date', 'prcp', 'tmax', 'tmin', 'rad', 'day_precip', 'day_real_feel',
-                            'day_wind', 'prev_count']
+                            'day_wind', 'prev_count', 'last_count']
 for state in states:
     if state not in st.session_state:
         if state=='date':
@@ -190,11 +190,16 @@ with c5:
     predict = st.button("predict", on_click=predict_biking())
     if predict:
         pred = st.session_state['pred']
-        st.markdown(f"<h1 style='text-align: left;'>{pred:0.0f} bikers", unsafe_allow_html=True)
+        st.write('')
+        last_count = float(st.session_state['last_count'])
+        delta = (pred - last_count) / last_count * 100
+        if delta==np.nan:
+            delta=0.0
+        st.metric('bikers:', f'{pred:0.0f}', f'{np.round(delta, 1)}%')
         if np.round(pred, 0) % 2 == 0:
-            st.markdown(f"<h1 style='text-align: left;'>&#127881 &#128692;&#8205;&#9792;&#65039;</h1>", unsafe_allow_html=True)
+            st.markdown(f"<h2 style='text-align: left;'>&#127881 &#128692;&#8205;&#9792;&#65039;</h2>", unsafe_allow_html=True)
         else:
-            st.markdown(f"<h1 style='text-align: left;'>&#127881 &#128692</h1>", unsafe_allow_html=True)
+            st.markdown(f"<h2 style='text-align: left;'>&#127881 &#128692</h2>", unsafe_allow_html=True)
 
 column1, column2 = st.columns(2)
 

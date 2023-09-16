@@ -96,8 +96,12 @@ def predict_biking():
             df[k] = v
         elif k=='hol':
             df[k] = bool(v)
+        elif k=='prev_count':
+            st.session_state['last_count'] = v
+            df[k] = float(v)
         else:
             df[k] = float(v)
+
     
     df['date'] = pd.to_datetime(df['date'])
     df['year'] = df['date'].dt.year
