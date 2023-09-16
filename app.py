@@ -209,7 +209,7 @@ with column1:
     st.write('Bike count data for this project came from NYC\'s Open Data Portal (link below) where the NYCDOT publishes \
             15-min interval data from bike counters placed across the city. The data for some counters goes back as \
             far as ten years.')
-    st.write('For this project, I focused on the predominant bike counters in New York that are placed on critical bike paths and bridges. \
+    st.write('For this project, I focused on the predominant bike counters that are placed on critical bike paths and bridges. \
             The below counters are the ones that were used for this analysis.')
     st.markdown("<div><i>Bike counters</i></div>", unsafe_allow_html=True)  
     with open('data/counter_dict.pkl', 'rb') as f:
@@ -220,7 +220,7 @@ with column1:
     st.write('The bike count data was retrieved on 9/13/23. I worked with daily data by grouping by the date and summing the total counts. \
             The dataset was limited to the dates between 1/1/14 and 9/1/23 as this is when all six counters were active. \
             This yielded 3,538 rows of data. While this is a very small dataset for any machine learning model, it does exhibit strong patterns \
-            which appears to make up for its small size.')
+            which appear to make up for its small size.')
     st.markdown("<h5 style='text-align: left;'>Features</h5>", unsafe_allow_html=True)  
     st.write('The input weather features were retrieved via historical weather APIs from Open MAteo and NOAA. The final model uses the below features.')
     st.markdown("<div><i>Input features</i></div>", unsafe_allow_html=True)  
