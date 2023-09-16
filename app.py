@@ -196,41 +196,58 @@ with c5:
         else:
             st.markdown(f"<h1 style='text-align: left;'>&#127881 &#128692</h1>", unsafe_allow_html=True)
 
-st.markdown("<h4 style='text-align: left;'>Methodology</h4>", unsafe_allow_html=True)       
-st.write('Bike count data for this project came from NYC\'s Open Data Portal (link below) where the NYCDOT publishes \
-         15-min interval data for bike counters they have placed across the city. The data for some counters goes back as \
-         ten years.')
-st.write('For this project, I focused on the predominant bike counters in New York that are placed on critical bike paths and bridges. \
-         The below counters are the ones that were used for this analysis.')
-counters = ['Manhattan Br', 'Brooklyn Br', 'Williamsburg Br', 'Kent Ave', 'Queensboro Br', 'Prospect Park W']
-st.write(counters)
-st.write('The bike count data was retrieved on 9/13/23. I worked with daily data by grouping by the date and summing the total counts. \
-         I limited the dataset to the dates between 1/1/14 and 9/1/23 because this is when all six counters were active. \
-         This yielded 3,538 rows of data. While it is a very small dataset for any machine learning model, it does exhibit strong patterns \
-         which lend themselves to learning.')
-st.write('My input weather features were retrieved via historical weather APIs from Open Meteo and NOAA. In the end, the model uses the below features.')
-st.write(input_features)
-st.write('Historical weather from Open Mateo was grouped by day and either summed or averaged depending on the feature. \
-         In initial testing, it became clear that the model failed horribly when extreme weather ocurred during the nighttime. \
-         This makes sense since most biking occurs during the day, and a nighttime thunderstorm has little impact on daytime ridership. \
-         Thankfully, Open Mateo provides a feature calls "is_day" which records whether a given hour is daytime. I used this \
-         feature as a mask to produce the daytime features listed above.')
-st.write('At the outset of training, Jan 2023 and Aug 2023 were witheld in as test sets. The remaining data was split \
-         into training (70%) and validation (30%) sets. Initial testing was performed with a range of regressors running with \
-         default hyperparamters. From that I narrowed in on xgboost.')
-st.write('I then went through uncountable rounds of feature selection and hyperparameter tuning (there were many more feature than what is listed above). \
-         Below are the performance metrics on the validation set.')
-st.markdown("<h4 style='text-align: left;'>Background & sources</h4>", unsafe_allow_html=True)
-li = 'https://www.linkedin.com/in/nliusont/'
-st.write('This streamlit app and underlying model were developed \
-         by [Nick Liu-Sontag](%s), a data scientist :nerd_face: in Brooklyn, NY' % li)
+column1, column2 = st.columns(2)
 
-od = 'https://data.cityofnewyork.us/Transportation/Bicycle-Counts/uczf-rk3c'
-om = 'https://open-meteo.com/'
-noa = 'https://www.ncdc.noaa.gov/cdo-web/webservices/v2#dataTypes'
-st.write('Sources: ')
-st.write('[NYC Open Data](%s)' % od)
-st.write('[Open Mateo Weather API](%s)' % om)
-st.write('[NOAA Climate Data Online API](%s)' % noa)
+with column1:
+    st.markdown("<h4 style='text-align: left;'>Methodology</h4>", unsafe_allow_html=True)
+    st.markdown("<h5 style='text-align: left;'>Data</h5>", unsafe_allow_html=True)    
+    st.write('Bike count data for this project came from NYC\'s Open Data Portal (link below) where the NYCDOT publishes \
+            15-min interval data from bike counters placed across the city. The data for some counters goes back as \
+            far as ten years.')
+    st.write('For this project, I focused on the predominant bike counters in New York that are placed on critical bike paths and bridges. \
+            The below counters are the ones that were used for this analysis.')
+    st.markdown("<div><i>Bike counters</i></div>", unsafe_allow_html=True)  
+    with open('data/counter_dict.pkl', 'rb') as f:
+        counters = pickle.load(f)
+    st.write(counters)
+    st.markdown("<div style='font-size: 12px;'><i>Kent Ave is a single counter that moved and is marked by two ids: 100058279 & 100010019</i></div>", unsafe_allow_html=True)  
+    st.write('')
+    st.write('The bike count data was retrieved on 9/13/23. I worked with daily data by grouping by the date and summing the total counts. \
+            The dataset was limited to the dates between 1/1/14 and 9/1/23 as this is when all six counters were active. \
+            This yielded 3,538 rows of data. While this is a very small dataset for any machine learning model, it does exhibit strong patterns \
+            which appears to make up for its small size.')
+    st.markdown("<h5 style='text-align: left;'>Features</h5>", unsafe_allow_html=True)  
+    st.write('The input weather features were retrieved via historical weather APIs from Open MAteo and NOAA. The final model uses the below features.')
+    st.markdown("<div><i>Input features</i></div>", unsafe_allow_html=True)  
+    st.write(input_features)
+    st.write('Historical weather from Open Mateo was grouped by day and either summed or averaged depending on the feature. \
+            In initial testing, it became clear that the model could not account for extreme weather that ocurrs in the nighttime. \
+            This makes sense since most biking occurs during the day, and a nighttime thunderstorm has little impact on daytime ridership. \
+            Thankfully, Open Mateo provides the feature "is_day", which records whether a given hour is daytime. I used this \
+            feature as a mask to produce the daytime features listed above.')
+    st.markdown("<div><i>Training</i></div>", unsafe_allow_html=True) 
+    st.write('At the outset of training, Jan 2023 and Aug 2023 were witheld as test sets. The remaining data was split \
+            into training (70%) and validation (30%) sets. Initial testing was performed with a range of regressors running with \
+            default hyperparameters. Xgboost was the clear favorite.')
+    st.write('I then went through uncountable rounds of feature selection and hyperparameter tuning (there were many more feature than what is listed above).')
+    st.markdown("<div><i>Performance</i></div>", unsafe_allow_html=True) 
+    st.write('The below tables list the models performance on each set of data')
+    with open('data/performance.pkl', 'rb') as f:
+        perf = pickle.load(f)
+    st.write(perf)
+    st.write('The MAE scores indicate a fair amount of overfitting to the training set, however, the results are still reasonably accurate.')
+
+    st.markdown("<h4 style='text-align: left;'>Background & sources</h4>", unsafe_allow_html=True)
+    li = 'https://www.linkedin.com/in/nliusont/'
+    st.write('This streamlit app and underlying model were developed \
+            by [Nick Liu-Sontag](%s), a data scientist :nerd_face: in Brooklyn, NY' % li)
+
+    od = 'https://data.cityofnewyork.us/Transportation/Bicycle-Counts/uczf-rk3c'
+    om = 'https://open-meteo.com/'
+    noa = 'https://www.ncdc.noaa.gov/cdo-web/webservices/v2#dataTypes'
+    st.write('Sources: ')
+    st.write('[NYC Open Data](%s)' % od)
+    st.write('[Open Mateo Weather API](%s)' % om)
+    st.write('[NOAA Climate Data Online API](%s)' % noa)
 
 
