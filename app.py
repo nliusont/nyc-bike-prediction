@@ -217,9 +217,9 @@ with column1:
     st.write(counters)
     st.markdown("<div style='font-size: 12px;'><i>Kent Ave is a single counter that moved and is marked by two ids: 100058279 & 100010019</i></div>", unsafe_allow_html=True)  
     st.write('')
-    st.write('The bike count data was retrieved on 9/13/23. I worked with daily data by grouping by the date and summing the total counts. \
+    st.write('The bike count data was retrieved on 9/13/23. I worked with daily data by grouping by the date and summing the total counts for each day. \
             The dataset was limited to the dates between 1/1/14 and 9/1/23 as this is when all six counters were active. \
-            This yielded 3,538 rows of data. While this is a very small dataset for any machine learning model, it does exhibit strong patterns \
+            This yielded 3,538 days of data. While this is a very small dataset for any machine learning model, it does exhibit strong patterns \
             which appear to make up for its small size.')
     st.markdown("<h5 style='text-align: left;'>Features</h5>", unsafe_allow_html=True)  
     st.write('The input weather features were retrieved via historical weather APIs from Open Mateo and NOAA. The final model uses the below features.')
