@@ -4,6 +4,7 @@ import streamlit as st
 import altair as alt
 from datetime import datetime, timedelta
 from app_funcs import get_forecast, predict_biking
+import pickle
 
 st.set_page_config(page_title="Predicting NYC Bike Ridership", layout="wide")
 
@@ -18,12 +19,14 @@ for state in states:
         else: 
             st.session_state[state] = str(0.)
 
+with open('data/feature_dict.pkl', 'rb') as f:
+    input_features = pickle.load(f)
+
 st.title("Predicting NYC Bike Ridership")
-st.write('This project uses (predominantly) weather data to predict daily bike ridership across New York City. New York City\
-         publishes bike ridership data via it\'s open data portal. I used the total daily counts across six primary bike\
-          counters and incorporated hourly weather data to train a predictive model to forecast the following day\'s ridership.')
-st.write('')
-st.write('The model utilizes gradient boosted trees via the xgboost library.')
+st.write('This is a model that predicts daily bike ridership across six of the primary bike\
+          counters in New York City. It turns out most day-to-day ridership is determined by the weather.')
+st.write('The model utilizes the xgboost python library. The primary source of inputs is hourly weather data.\
+         Scroll down for more of the geeky details on methodology.')
 st.write('')
 st.write('The below charts show prediction results for two months in 2023. These months were witheld from model training and validation so \
          the model has never seen them before.')
@@ -193,8 +196,30 @@ with c5:
         else:
             st.markdown(f"<h1 style='text-align: left;'>&#127881 &#128692</h1>", unsafe_allow_html=True)
 
-        
-
+st.markdown("<h4 style='text-align: left;'>Methodology</h4>", unsafe_allow_html=True)       
+st.write('Bike count data for this project came from NYC\'s Open Data Portal (link below) where the NYCDOT publishes \
+         15-min interval data for bike counters they have placed across the city. The data for some counters goes back as \
+         ten years.')
+st.write('For this project, I focused on the predominant bike counters in New York that are placed on critical bike paths and bridges. \
+         The below counters are the ones that were used for this analysis.')
+counters = ['Manhattan Br', 'Brooklyn Br', 'Williamsburg Br', 'Kent Ave', 'Queensboro Br', 'Prospect Park W']
+st.write(counters)
+st.write('The bike count data was retrieved on 9/13/23. I worked with daily data by grouping by the date and summing the total counts. \
+         I limited the dataset to the dates between 1/1/14 and 9/1/23 because this is when all six counters were active. \
+         This yielded 3,538 rows of data. While it is a very small dataset for any machine learning model, it does exhibit strong patterns \
+         which lend themselves to learning.')
+st.write('My input weather features were retrieved via historical weather APIs from Open Meteo and NOAA. In the end, the model uses the below features.')
+st.write(input_features)
+st.write('Historical weather from Open Mateo was grouped by day and either summed or averaged depending on the feature. \
+         In initial testing, it became clear that the model failed horribly when extreme weather ocurred during the nighttime. \
+         This makes sense since most biking occurs during the day, and a nighttime thunderstorm has little impact on daytime ridership. \
+         Thankfully, Open Mateo provides a feature calls "is_day" which records whether a given hour is daytime. I used this \
+         feature as a mask to produce the daytime features listed above.')
+st.write('At the outset of training, Jan 2023 and Aug 2023 were witheld in as test sets. The remaining data was split \
+         into training (70%) and validation (30%) sets. Initial testing was performed with a range of regressors running with \
+         default hyperparamters. From that I narrowed in on xgboost.')
+st.write('I then went through uncountable rounds of feature selection and hyperparameter tuning (there were many more feature than what is listed above). \
+         Below are the performance metrics on the validation set.')
 st.markdown("<h4 style='text-align: left;'>Background & sources</h4>", unsafe_allow_html=True)
 li = 'https://www.linkedin.com/in/nliusont/'
 st.write('This streamlit app and underlying model were developed \
