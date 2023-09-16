@@ -222,7 +222,7 @@ with column1:
             This yielded 3,538 rows of data. While this is a very small dataset for any machine learning model, it does exhibit strong patterns \
             which appear to make up for its small size.')
     st.markdown("<h5 style='text-align: left;'>Features</h5>", unsafe_allow_html=True)  
-    st.write('The input weather features were retrieved via historical weather APIs from Open MAteo and NOAA. The final model uses the below features.')
+    st.write('The input weather features were retrieved via historical weather APIs from Open Mateo and NOAA. The final model uses the below features.')
     st.markdown("<div><i>Input features</i></div>", unsafe_allow_html=True)  
     st.write(input_features)
     st.write('Historical weather from Open Mateo was grouped by day and either summed or averaged depending on the feature. \
