@@ -243,7 +243,7 @@ with column1:
     st.write('The MAE scores indicate a fair amount of overfitting to the training set, however, the results are still reasonably accurate.')
 
     st.markdown("<h4 style='text-align: left;'>Background & sources</h4>", unsafe_allow_html=True)
-    li = 'https://www.linkedin.com/in/nliusont/'
+    li = 'https://www.nls.website/'
     st.write('This streamlit app and underlying model were developed \
             by [Nick Liu-Sontag](%s), a data scientist :nerd_face: in Brooklyn, NY' % li)
 
