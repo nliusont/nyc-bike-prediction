@@ -205,6 +205,9 @@ column1, column2 = st.columns(2)
 
 with column1:
     st.markdown("<h4 style='text-align: left;'>Methodology</h4>", unsafe_allow_html=True)
+    gh = 'https://github.com/nliusont/nyc-bike-counts'
+    st.write('You can find the notebooks that I used to prepare this data and model \
+        [here](%s).' % gh)
     st.markdown("<h5 style='text-align: left;'>Data</h5>", unsafe_allow_html=True)    
     st.write('Bike count data for this project came from NYC\'s Open Data Portal (link below) where the NYCDOT publishes \
             15-min interval data from bike counters placed across the city. The data for some counters goes back as \
